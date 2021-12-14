@@ -50,10 +50,10 @@ public class AdminController {
             user.setRoles(roles);
         } else {
             if (role.get().equals("1")) {
-                user.setRoles(Collections.singleton(roleRepository.findById(1L).get()));
+                user.setRoles(Collections.singleton(roleRepository.findById(2L).get()));
             } else {
                 if (role.get().equals("2")) {
-                    user.setRoles(Collections.singleton(roleRepository.findById(2L).get()));
+                    user.setRoles(Collections.singleton(roleRepository.findById(1L).get()));
                 } else {
                     return "addUser";
                 }
@@ -64,7 +64,7 @@ public class AdminController {
     }
 
     @RequestMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") long id, @Valid User user, BindingResult result) {
+    public String updateUser(@RequestParam Optional<String> role, @PathVariable("id") long id, @Valid User user, BindingResult result) {
         if (result.hasErrors()) {
             User original = userRepository.findById(id).get();
             user.setName(original.getName());
@@ -74,7 +74,22 @@ public class AdminController {
             user.setId(id);
             return "changeUser";
         }
-
+        if (role.get().equalsIgnoreCase("1,2")) {
+            Set<Role> roles = new HashSet<>();
+            roles.add(roleRepository.findById(1L).get());
+            roles.add(roleRepository.findById(2L).get());
+            user.setRoles(roles);
+        } else {
+            if (role.get().equals("1")) {
+                user.setRoles(Collections.singleton(roleRepository.findById(2L).get()));
+            } else {
+                if (role.get().equals("2")) {
+                    user.setRoles(Collections.singleton(roleRepository.findById(1L).get()));
+                } else {
+                    return "changeUser";
+                }
+            }
+        }
         userRepository.save(user);
 
         return "redirect:/admin/";
