@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import java.security.AuthProvider;
 
 
 @Configuration
@@ -38,9 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin()
                 //указываем логику обработки при логине
                 .successHandler(new SuccessUserHandler())
+                .loginPage("/login.html")
                 // Указываем параметры логина и пароля с формы логина
-                .usernameParameter("j_username")
-                .passwordParameter("j_password")
+                .usernameParameter("email")
+                .passwordParameter("password")
                 // даем доступ к форме логина всем
                 .permitAll();
 

@@ -3,9 +3,9 @@ package web.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Set;
 
@@ -19,14 +19,20 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank
     private String name;
 
-    @NotBlank(message = "Password is mandatory")
+    @NotBlank
+    private String lastName;
+
+    @NotNull
+    private int age;
+
+    @NotNull(message = "")
     private String password;
 
-    @NotBlank(message = "Email is mandatory")
+    @Column(unique = true)
+    @NotBlank
     private String email;
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
@@ -36,6 +42,22 @@ public class User implements UserDetails {
             inverseJoinColumns = { @JoinColumn(name = "role_id") }
     )
     private Set<Role> roles;
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
 
     public String getName() {
         return name;
@@ -107,4 +129,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

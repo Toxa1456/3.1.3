@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
     @EntityGraph(value = "roles.detail", type = EntityGraph.EntityGraphType.LOAD)
-    User findByName(String name);
+    User findByEmail(String email);
     @EntityGraph(value = "roles.detail", type = EntityGraph.EntityGraphType.LOAD)
     Optional<User> findById(Long id);
 }

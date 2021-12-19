@@ -1,44 +1,87 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>UserPage</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/shards.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-<div class="col-md-6">
-    <h2 class="my-5">User Page</h2>
-    <table class="table table-striped table-responsive-md">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Password</th>
-            <th>Email</th>
-            <th>Role</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:action="@{/user/}" th:object="${user}">
-            <td th:text="${user.getUsername()}"></td>
-            <td th:text="${user.getPassword()}"></td>
-            <td th:text="${user.getEmail()}"></td>
-            <td>
-            <div th:each="role : ${user.getRoles()}">
-                <span th:text="${role.getRole()}"></span>
-            </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<div class="container-fluid" style="background: rgba(0,0,0,0.03); position: absolute; width: 100%; height: 100%">
     <div class="row">
-        <div class="col-md-6 mt-5">
-            <form action="/logout">
-                <input type="submit" class="btn btn-primary" value="Log Out">
-            </form>
+        <header class="col-12" style="margin-top: 40px">
+            <!-- Fixed navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" style="height: 40px">
+                <span style="color: white; font-weight: bold" th:text="${user.getEmail()}"></span>
+                <span style="margin-right: 5px; margin-left: 5px; color: white">with roles:</span>
+                <div th:each="role : ${user.getRoles()}" th:text="${role.getRole()}" style="color: white; margin-right: 5px"></div>
+                <a class="text-end" style="color: gray; margin-left: auto" href="/logout">Logout</a>
+            </nav>
+        </header>
+        <nav class="sidenav" style="background-color: white; width: 300px; padding-top: 15px; height: 100%;
+position: fixed; top: 40px; left: 0">
+            <div>
+                <div th:if="${user.getRoles().size() == 2}">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link text-left" href="/admin/" style="width: 300px">Admin</a>
+                        </li>
+                        <li  class="nav-item">
+                            <span class="nav-link btn btn-primary text-left" style="width: 300px">User</span>
+                        </li>
+                    </ul>
+                </div>
+                <div th:if="${user.getRoles().size() == 1}">
+                    <ul th:each="role : ${user.getRoles()}" class="nav nav-pills">
+                        <li th:if="${role.getRole() == 'ADMIN'}" class="nav-item">
+                            <a class="nav-link text-left" href="/admin/" style="width: 300px">Admin</a>
+                        </li>
+                        <li th:if="${role.getRole() == 'USER'}"  class="nav-item">
+                            <span class="nav-link btn btn-primary text-left" style="width: 300px">User</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="col-10" style="margin-left: 310px; height: 100%">
+            <h1 style="font-weight: normal; margin-top: 10px" class="text-left">User information-page</h1>
+            <table class="table border" style="border-color: gray; margin-top: 15px; background-color: white">
+                <thead style="background: rgba(0,0,0,0.02)">
+                <tr><th style="font-weight: revert; font-size: large">About User</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <table class="table table-striped" style="background-color: white; margin-outside: 15px">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Age</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:action="@{/user/}" th:object="${user}">
+                                <td th:text="${user.getId()}"></td>
+                                <td th:text="${user.getUsername()}"></td>
+                                <td th:text="${user.getLastName()}"></td>
+                                <td th:text="${user.getAge()}"></td>
+                                <td th:text="${user.getEmail()}"></td>
+                                <td>
+                                    <span th:each="role : ${user.getRoles()}" th:text="${role.getRole()}" style="margin-right: 5px"></span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
