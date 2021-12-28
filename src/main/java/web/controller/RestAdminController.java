@@ -8,8 +8,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import web.model.Role;
 import web.model.User;
-import web.repositories.RoleRepository;
-import web.repositories.UserRepository;
+import web.service.RoleService;
+import web.service.UserService;
 import java.util.*;
 
 
@@ -17,18 +17,18 @@ import java.util.*;
 @RequestMapping("/admin")
 public class RestAdminController {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
-    public RestAdminController(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+    public RestAdminController(UserService userRepository, RoleService roleRepository) {
+        this.userService = userRepository;
+        this.roleService = roleRepository;
     }
 
     @GetMapping("/table")
     public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = (List<User>) userRepository.findAll();
+        List<User> users = userService.findAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -38,52 +38,49 @@ public class RestAdminController {
     }
 
     @PostMapping("/users/{role}")
-    public ResponseEntity addNewUser(@RequestBody User user, @PathVariable("role") Optional<String> role) {
+    public ResponseEntity<String> addNewUser(@RequestBody User user, @PathVariable("role") Optional<String> role) {
         setRoles(role, user);
-        userRepository.save(user);
-        return new ResponseEntity(HttpStatus.OK);
+        userService.save(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getOneUser(@PathVariable("id") long id) {
-        User user = userRepository.findById(id).get();
+        User user = userService.findById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
 
     @PutMapping("/users/{id}/{role}")
-    public ResponseEntity updateUser(@PathVariable("id") long id,  @PathVariable("role") Optional<String> role, @RequestBody User user) {
+    public ResponseEntity<String> updateUser(@PathVariable("id") long id,  @PathVariable("role") Optional<String> role, @RequestBody User user) {
 
-        User original = userRepository.findById(id).get();
+        User original = userService.findById(id);
         setRoles(role, user);
         if (user.getPassword().equals("")) {
             user.setPassword(original.getPassword());
         }
 
-        userRepository.save(user);
-        return new ResponseEntity(HttpStatus.OK);
+        userService.save(user);
+        return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
     @DeleteMapping("users/{id}")
-    public ResponseEntity deleteUser(@PathVariable("id") long id) {
-        User user = userRepository.findById(id).get();
-        userRepository.delete(user);
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<String> deleteUser(@PathVariable("id") long id) {
+        userService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void setRoles(@RequestParam Optional<String> role, User user) {
         if (role.get().equalsIgnoreCase("1,2")) {
-            Set<Role> roles = new HashSet<>();
-            roles.add(roleRepository.findById(1L).get());
-            roles.add(roleRepository.findById(2L).get());
+            Set<Role> roles = roleService.findAllRoles();
             user.setRoles(roles);
         } else {
             if (role.get().equals("1")) {
-                user.setRoles(Collections.singleton(roleRepository.findById(2L).get()));
+                user.setRoles(Collections.singleton(roleService.findRoleById(2L)));
             } else {
                 if (role.get().equals("2")) {
-                    user.setRoles(Collections.singleton(roleRepository.findById(1L).get()));
+                    user.setRoles(Collections.singleton(roleService.findRoleById(1L)));
                 }
             }
         }

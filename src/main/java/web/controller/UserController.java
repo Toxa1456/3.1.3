@@ -13,10 +13,12 @@ import web.model.User;
 @RequestMapping
 public class UserController {
 
-    @RequestMapping("/admin")
+    @GetMapping("/admin")
     public String getPage() {
         return "/admin";
     }
+
+
     @RequestMapping("/user")
     public String helloUser (@AuthenticationPrincipal User user, ModelMap model) {
         model.addAttribute("user", user);

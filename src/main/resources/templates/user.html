@@ -17,7 +17,7 @@
         <nav class="sidenav" style="background-color: white; width: 300px; padding-top: 15px; height: 100%;
 position: fixed; top: 40px; left: 0">
             <div>
-                <div th:if="${user.getRoles().contains('ADMIN')}">
+                <div th:if="${user.roleToString().contains('ADMIN')}">
                     <ul class="nav nav-pills">
                         <li class="nav-item">
                             <a class="nav-link text-left" href="/admin" style="width: 300px">Admin</a>
@@ -27,7 +27,7 @@ position: fixed; top: 40px; left: 0">
                         </li>
                     </ul>
                 </div>
-                <div th:if="${user.getRoles() == 'USER'}">
+                <div th:if="${user.roleToString() == 'USER'}">
                     <ul class="nav nav-pills">
                         <li class="nav-item">
                             <span class="nav-link btn btn-primary text-left" style="width: 300px">User</span>
@@ -63,7 +63,7 @@ position: fixed; top: 40px; left: 0">
                                 <td th:text="${user.getLastName()}"></td>
                                 <td th:text="${user.getAge()}"></td>
                                 <td th:text="${user.getEmail()}"></td>
-                                <td th:text="${user.getRoles()}"></td>
+                                <td th:text="${user.roleToString()}"></td>
                             </tr>
                             </tbody>
                         </table>

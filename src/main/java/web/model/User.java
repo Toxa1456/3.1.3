@@ -40,10 +40,6 @@ public class User implements UserDetails {
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "role_id") }
     )
-//    @JsonIdentityInfo(
-//            generator = ObjectIdGenerators.PropertyGenerator.class,
-//            property = "role"
-//    )
 
     private Set<Role> roles;
 
@@ -103,8 +99,13 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
     @JsonGetter("role")
-    public String getRoles() {
+    public String roleToString() {
         StringBuilder rol = new StringBuilder();
 
         for (Role role : roles) {
@@ -113,6 +114,7 @@ public class User implements UserDetails {
         rol.delete(rol.length() - 2, rol.length());
         return rol.toString();
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
