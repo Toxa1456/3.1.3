@@ -28,11 +28,14 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         User user = userRepository.findByEmail(email);
 
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            user = userRepository.findByName(email);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found");
+            }
         }
-
         return user;
     }
+
 
     @Override
     public User findById(Long id) {

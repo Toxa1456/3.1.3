@@ -10,20 +10,24 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import javax.sql.DataSource;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
-
     private final UserDetailsService userDetailsService;
 
+    private final DataSource dataSource;
+
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService){
+    public SecurityConfig(UserDetailsService userDetailsService, DataSource dataSource){
         this.userDetailsService = userDetailsService;
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -31,10 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.formLogin()
+        http
+                .formLogin()
                 //указываем логику обработки при логине
                 .successHandler(new SuccessUserHandler())
                 .loginPage("/login")
@@ -42,24 +46,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .usernameParameter("email")
                 .passwordParameter("password")
                 // даем доступ к форме логина всем
-                .permitAll();
+                .permitAll()
 
-        http.logout()
+                .and()
+                .logout()
                 // разрешаем делать логаут всем
                 .permitAll()
                 // указываем URL логаута
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 //выключаем кроссдоменную секьюрность (на этапе обучения неважна)
-                .and().csrf().disable();
-        http
+
+                .and()
+                .csrf().disable()
+
                 // делаем страницу регистрации недоступной для авторизированных пользователей
                 .authorizeRequests()
                 //страницы аутентификаци доступна всем
                 .antMatchers("/login").anonymous()
                 // защищенные URL
-                .antMatchers("/user").access("hasAnyRole('ADMIN', 'USER')")
-                .antMatchers( "/admin").access("hasAnyRole('ADMIN')").anyRequest().authenticated();
+                .antMatchers("/user").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers( "/admin").hasAuthority("ROLE_ADMIN").anyRequest().authenticated()
+                .and()
+                .rememberMe().userDetailsService(this.userDetailsService).tokenRepository(persistentTokenRepository()).key("aDsart214265sdddrf").tokenValiditySeconds(82000);
+    }
 
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
+        db.setDataSource(dataSource);
+        return db;
     }
 
     @Bean

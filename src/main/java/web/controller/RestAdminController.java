@@ -14,7 +14,7 @@ import java.util.*;
 
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("admin")
 public class RestAdminController {
 
     private final UserService userService;
